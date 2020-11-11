@@ -15,13 +15,40 @@ router.post('/upload', (req, res) => {
 });
 
 router.post('/', req => {
+    console.log(req.body)
     Sound.create(req.body)
 })
 
-router.get("/", async (_req, res) => {
-    const posts = await Sound.findOne({})
-    res.send(posts)
-})
+router.get('/', async(req, res, next) => {
+
+    const { page = 1, limit = 5, sortby = "likes", search = "", category ="" } = req.query;
+    console.log(req.query)
+    console.log("hey")
+    const searchRegExp = new RegExp(search, 'i');
+    const filter = new RegExp(category, 'i');
+    const category_filter = category == "" ? filter : category
+    try {
+        // execute query with page and limit values
+        const posts = await Sound.find({"owner": searchRegExp, "category": category_filter})
+	    .sort(sortby) 
+            .limit(limit * 1)
+            .skip((page - 1) * limit)
+            .exec();
+
+        // get total documents in the Posts collection 
+        const count = await Sound.countDocuments({"category": category_filter});
+
+        // return response with posts, total pages, and current page
+        res.json({
+            posts,
+            totalPages: count,//Math.ceil(count / limit),
+            currentPage: page,
+
+        });
+    } catch (err) {
+        console.error(err.message);
+    }
+});
 
 router.use(express.static('uploads'))
 

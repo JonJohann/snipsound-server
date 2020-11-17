@@ -7,8 +7,8 @@ require('dotenv').config();
 
 const port = process.env.PORT || 3074;
 
-mongoose.connect(process.env.DB, { useNewUrlParser: true })
-  .then(() => console.log(`Database connected successfully`))
+mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log(`📠 Database connected successfully!`))
   .catch(err => console.log(err));
 
 mongoose.Promise = global.Promise;
@@ -24,7 +24,7 @@ server.use((req, res, next) => {
 server.use('/', routes);
 
 server.listen(port, () => {
-    console.log(`Server running on port ${port}`)
+    console.log(`🚀 Server running on port ${port}`)
 });
 
 
